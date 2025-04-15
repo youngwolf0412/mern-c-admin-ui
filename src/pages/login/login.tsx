@@ -16,6 +16,7 @@ import { Credentials } from "../../types";
 import { login, self, logout } from "../../http/api";
 import { useAuthStore } from "../../store";
 import { usePermission } from "../../hooks/usePermission";
+import { Navigate } from "react-router-dom";
 
 const loginUser = async (credentials: Credentials) => {
   // login fn makes a post request to the backend server with the credentials
@@ -31,7 +32,7 @@ const getSelf = async () => {
 
 const LoginPage = () => {
   const { isAllowed } = usePermission();
-  const { setUser, logout: logoutFromAuthStore } = useAuthStore();
+  const { user, setUser, logout: logoutFromAuthStore } = useAuthStore();
   const { refetch } = useQuery({
     queryKey: ["self"],
     queryFn: getSelf,
@@ -56,9 +57,14 @@ const LoginPage = () => {
         logoutMutate();
       }
       setUser(selfDataPromise.data);
-      // console.log("User data", selfData);
+      console.log("User data", selfDataPromise.data);
     },
   });
+
+  // Check if the user is already logged in
+  if (user !== null) {
+    return <Navigate to="/" replace={true} />;
+  }
 
   return (
     <>
