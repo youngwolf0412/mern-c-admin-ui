@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
+import { Tenant } from "./types";
 
 export interface User {
   id: number;
@@ -7,6 +8,7 @@ export interface User {
   lastName: string;
   email: string;
   role: string;
+  tenant?: Tenant | null;
 }
 
 interface AuthState {

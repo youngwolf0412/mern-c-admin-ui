@@ -43,7 +43,7 @@ const Dashboard = () => {
   } = theme.useToken();
 
   if (user === null) {
-    <Navigate to="/auth/login" replace={true} />;
+    return <Navigate to="/auth/login" replace={true} />;
   }
 
   const items = [
@@ -97,7 +97,14 @@ const Dashboard = () => {
             }}
           >
             <Flex gap="middle" align="center" justify="space-between">
-              <Badge text="Global" />
+              <Badge
+                text={
+                  user.role === "admin"
+                    ? "You are an admin"
+                    : user.tenant?.address
+                }
+                status="success"
+              />
               <Space size={16}>
                 <Badge dot={true}>
                   <BellFilled />
