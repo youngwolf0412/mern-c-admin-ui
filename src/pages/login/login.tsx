@@ -32,7 +32,7 @@ const getSelf = async () => {
 
 const LoginPage = () => {
   const { isAllowed } = usePermission();
-  const { user, setUser, logout: logoutFromAuthStore } = useAuthStore();
+  const { setUser, logout: logoutFromAuthStore } = useAuthStore();
   const { refetch } = useQuery({
     queryKey: ["self"],
     queryFn: getSelf,
@@ -44,7 +44,6 @@ const LoginPage = () => {
     mutationFn: logout,
     onSuccess: () => {
       logoutFromAuthStore();
-      return;
     },
   });
   const { mutate, isPending, isError, error } = useMutation({
@@ -55,16 +54,14 @@ const LoginPage = () => {
       // "admin", "customer","manager"
       if (!isAllowed(selfDataPromise.data)) {
         logoutMutate();
+        setUser(null);
+        return;
       }
       setUser(selfDataPromise.data);
-      console.log("User data", selfDataPromise.data);
+
+      // console.log("User data", selfDataPromise.data);
     },
   });
-
-  // Check if the user is already logged in
-  if (user !== null) {
-    return <Navigate to="/" replace={true} />;
-  }
 
   return (
     <>
