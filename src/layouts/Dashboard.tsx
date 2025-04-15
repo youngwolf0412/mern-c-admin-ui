@@ -1,8 +1,19 @@
 import { Navigate, NavLink, Outlet } from "react-router-dom";
 import { useAuthStore } from "../store";
-import { Breadcrumb, Layout, Menu, theme } from "antd";
+import {
+  Avatar,
+  Badge,
+  Breadcrumb,
+  Dropdown,
+  Flex,
+  Layout,
+  Menu,
+  Space,
+  theme,
+} from "antd";
 import { Content, Footer, Header } from "antd/es/layout/layout";
 import {
+  BellFilled,
   GiftOutlined,
   HomeOutlined,
   OrderedListOutlined,
@@ -11,15 +22,26 @@ import {
 } from "@ant-design/icons";
 import { useState } from "react";
 import Logo from "../components/icons/Logo";
+import { useMutation } from "@tanstack/react-query";
+import { logout } from "../http/api";
 const { Sider } = Layout;
 const Dashboard = () => {
   const [collapsed, setCollapsed] = useState(false);
+  const { user, logout: logoutFromStore } = useAuthStore();
+
+  const { mutate: logoutMutate } = useMutation({
+    mutationKey: ["logout"],
+    mutationFn: logout,
+    onSuccess: async () => {
+      logoutFromStore();
+      return;
+    },
+  });
 
   const {
     token: { colorBgContainer },
   } = theme.useToken();
 
-  const { user } = useAuthStore();
   if (user === null) {
     <Navigate to="/auth/login" replace={true} />;
   }
@@ -67,21 +89,44 @@ const Dashboard = () => {
           <Menu defaultSelectedKeys={["/"]} mode="inline" items={items} />
         </Sider>
         <Layout>
-          <Header style={{ padding: 0, background: colorBgContainer }} />
+          <Header
+            style={{
+              paddingLeft: "16px",
+              paddingRight: "16px",
+              background: colorBgContainer,
+            }}
+          >
+            <Flex gap="middle" align="center" justify="space-between">
+              <Badge text="Global" />
+              <Space size={16}>
+                <Badge dot={true}>
+                  <BellFilled />
+                </Badge>
+                <Dropdown
+                  menu={{
+                    items: [
+                      {
+                        key: "logout",
+                        label: "Logout",
+                        onClick: () => logoutMutate(),
+                      },
+                    ],
+                  }}
+                  placement="bottomRight"
+                >
+                  <Avatar
+                    style={{
+                      backgroundColor: "#fde3cf",
+                      color: "#f56a00",
+                    }}
+                  >
+                    U
+                  </Avatar>
+                </Dropdown>
+              </Space>
+            </Flex>
+          </Header>
           <Content style={{ margin: "0 16px" }}>
-            {/* <Breadcrumb style={{ margin: "16px 0" }}>
-              <Breadcrumb.Item>User</Breadcrumb.Item>
-              <Breadcrumb.Item>Bill</Breadcrumb.Item>
-            </Breadcrumb> */}
-            {/* <div
-              style={{
-                padding: 24,
-                minHeight: 360,
-                background: colorBgContainer,
-              }}
-            >
-              Bill is a cat.
-            </div> */}
             <Outlet />
           </Content>
           <Footer style={{ textAlign: "center" }}>
