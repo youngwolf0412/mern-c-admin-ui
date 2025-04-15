@@ -37,6 +37,15 @@ const LoginPage = () => {
     queryFn: getSelf,
     enabled: false,
   });
+
+  const { mutate: logoutMutate } = useMutation({
+    mutationKey: ["logout"],
+    mutationFn: logout,
+    onSuccess: () => {
+      logoutFromAuthStore();
+      return;
+    },
+  });
   const { mutate, isPending, isError, error } = useMutation({
     mutationKey: ["login"],
     mutationFn: loginUser,
@@ -44,9 +53,7 @@ const LoginPage = () => {
       const selfDataPromise = await refetch();
       // "admin", "customer","manager"
       if (!isAllowed(selfDataPromise.data)) {
-        await logout();
-        logoutFromAuthStore();
-        return;
+        logoutMutate();
       }
       setUser(selfDataPromise.data);
       // console.log("User data", selfData);
