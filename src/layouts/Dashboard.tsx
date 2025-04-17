@@ -18,6 +18,7 @@ import {
   HomeOutlined,
   OrderedListOutlined,
   ProductOutlined,
+  ShopOutlined,
   UserOutlined,
 } from "@ant-design/icons";
 import { useState } from "react";
@@ -56,6 +57,11 @@ const Dashboard = () => {
       key: "/users",
       icon: <UserOutlined />,
       label: <NavLink to="/users">Users</NavLink>,
+    },
+    {
+      key: "/tenants",
+      icon: <ShopOutlined />,
+      label: <NavLink to="/tenants">Restuarants</NavLink>,
     },
     {
       key: "/products",

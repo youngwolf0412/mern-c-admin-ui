@@ -1,11 +1,17 @@
-import { Breadcrumb, Button, Drawer, Space, Table } from "antd";
 import { PlusOutlined, RightOutlined } from "@ant-design/icons";
-import { Link } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import { getUsers } from "../../http/api";
-import { User } from "../../types";
-import UsersFilter from "./UsersFilter";
+import {
+  QueryClient,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
+import { Breadcrumb, Button, Drawer, Form, Space, Table, theme } from "antd";
 import { useState } from "react";
+import { Link } from "react-router-dom";
+import { createUser, getUsers } from "../../http/api";
+import UsersFilter from "./UsersFilter";
+import UserForm from "./forms/UserForm";
+import { CreateUserData } from "../../types";
 
 const columns = [
   {
@@ -32,6 +38,11 @@ const columns = [
 
 const Users = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const queryClient = useQueryClient();
+  const {
+    token: { colorBgLayout },
+  } = theme.useToken();
+  const [form] = Form.useForm();
 
   const { data: users, isLoading } = useQuery({
     queryKey: ["users"],
@@ -40,6 +51,24 @@ const Users = () => {
       return res.data;
     },
   });
+
+  const { mutate: userMutate } = useMutation({
+    mutationKey: ["user"],
+    mutationFn: async (data: CreateUserData) =>
+      createUser(data).then((res) => res.data),
+    onSuccess: async () => {
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+      return;
+    },
+  });
+
+  const onHandleSubmit = async () => {
+    await form.validateFields();
+    await userMutate(form.getFieldsValue());
+    // console.log("SUBMITING FORM", form.getFieldsValue(true));
+    setDrawerOpen(false);
+  };
+
   return (
     <>
       <Breadcrumb
@@ -70,7 +99,7 @@ const Users = () => {
       <Drawer
         title="Create User"
         width={720}
-        // styles={{ body: { backgroundColor: colorBgLayout } }}
+        styles={{ body: { backgroundColor: colorBgLayout } }}
         destroyOnClose={true}
         open={drawerOpen}
         onClose={() => {
@@ -84,32 +113,22 @@ const Users = () => {
           <Space>
             <Button
               onClick={() => {
-                // form.resetFields();
-                // setDrawerOpen(false);
+                form.resetFields();
+                setDrawerOpen(false);
               }}
             >
               Cancel
             </Button>
-            <Button type="primary">Submit</Button>
+            <Button type="primary" onClick={onHandleSubmit}>
+              Submit
+            </Button>
           </Space>
         }
       >
-        <p>some contetn....</p>
-        <p>some contetn....</p>
-        <p>some contetn....</p>
-        {/* <Form layout="vertical" form={form}>
-          <UserForm isEditMode={!!currentEditingUser} />
-        </Form> */}
+        <Form layout="vertical" form={form}>
+          <UserForm isEditMode={true} />
+        </Form>
       </Drawer>
-
-      {/* {users && (
-        <ul>
-          <h1>Users</h1>
-          {users["data"].map((user: User) => (
-            <li key={user.id}>{user.firstName}</li>
-          ))}
-        </ul>
-      )} */}
     </>
   );
 };
