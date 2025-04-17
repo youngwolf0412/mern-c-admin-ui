@@ -1,9 +1,32 @@
-import { Breadcrumb } from "antd";
+import { Breadcrumb, Table } from "antd";
 import { RightOutlined } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { getUsers } from "../../http/api";
 import { User } from "../../types";
+
+const columns = [
+  {
+    title: "ID",
+    dataIndex: "id",
+    key: "id",
+  },
+  {
+    title: "First Name",
+    dataIndex: "firstName",
+    key: "firstName",
+  },
+  {
+    title: "Last Name",
+    dataIndex: "lastName",
+    key: "lastName",
+  },
+  {
+    title: "Email",
+    dataIndex: "email",
+    key: "email",
+  },
+];
 
 const Users = () => {
   const { data: users, isLoading } = useQuery({
@@ -28,14 +51,16 @@ const Users = () => {
       />
       {isLoading && <div>Loading...</div>}
 
-      {users && (
+      <Table columns={columns} dataSource={users["data"]} />
+
+      {/* {users && (
         <ul>
           <h1>Users</h1>
           {users["data"].map((user: User) => (
             <li key={user.id}>{user.firstName}</li>
           ))}
         </ul>
-      )}
+      )} */}
     </>
   );
 };
