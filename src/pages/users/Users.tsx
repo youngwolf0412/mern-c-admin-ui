@@ -65,6 +65,7 @@ const Users = () => {
   const onHandleSubmit = async () => {
     await form.validateFields();
     await userMutate(form.getFieldsValue());
+    form.resetFields();
     // console.log("SUBMITING FORM", form.getFieldsValue(true));
     setDrawerOpen(false);
   };
@@ -105,7 +106,7 @@ const Users = () => {
         onClose={() => {
           console.log("CLODINSG");
 
-          // form.resetFields();
+          form.resetFields();
           // setCurrentEditingUser(null);
           setDrawerOpen(false);
         }}
