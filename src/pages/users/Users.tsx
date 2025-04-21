@@ -64,7 +64,7 @@ const Users = () => {
 
   const onHandleSubmit = async () => {
     await form.validateFields();
-    await userMutate(form.getFieldsValue());
+    userMutate(form.getFieldsValue());
     form.resetFields();
     // console.log("SUBMITING FORM", form.getFieldsValue(true));
     setDrawerOpen(false);
@@ -84,7 +84,6 @@ const Users = () => {
         ]}
       />
       {isLoading && <div>Loading...</div>}
-
       <UsersFilter>
         <Button
           type="primary"
@@ -96,7 +95,6 @@ const Users = () => {
       </UsersFilter>
 
       <Table columns={columns} dataSource={users?.data} />
-
       <Drawer
         title="Create User"
         width={720}
@@ -104,7 +102,7 @@ const Users = () => {
         destroyOnClose={true}
         open={drawerOpen}
         onClose={() => {
-          console.log("CLODINSG");
+          // console.log("CLODINSG");
 
           form.resetFields();
           // setCurrentEditingUser(null);

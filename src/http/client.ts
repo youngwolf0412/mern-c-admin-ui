@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useAuthStore } from "../store";
+import { AUTH_SERVICE } from "./api";
 
 // This file is used to create an axios instance with a base URL and default headers.
 // It is used to make API requests to the backend server.
@@ -14,7 +15,7 @@ export const api = axios.create({
 
 const refreshToken = async () => {
   await axios.post(
-    `${import.meta.env.VITE_BACKEND_API_URL}/auth/refresh`,
+    `${import.meta.env.VITE_BACKEND_API_URL}/${AUTH_SERVICE}/auth/refresh`,
     {},
     {
       withCredentials: true,
