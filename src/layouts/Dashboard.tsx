@@ -1,17 +1,3 @@
-import { Navigate, NavLink, Outlet } from "react-router-dom";
-import { useAuthStore } from "../store";
-import {
-  Avatar,
-  Badge,
-  Breadcrumb,
-  Dropdown,
-  Flex,
-  Layout,
-  Menu,
-  Space,
-  theme,
-} from "antd";
-import { Content, Footer, Header } from "antd/es/layout/layout";
 import {
   BellFilled,
   GiftOutlined,
@@ -21,12 +7,26 @@ import {
   ShopOutlined,
   UserOutlined,
 } from "@ant-design/icons";
-import { useState } from "react";
-import Logo from "../components/icons/Logo";
 import { useMutation } from "@tanstack/react-query";
+import {
+  Avatar,
+  Badge,
+  Dropdown,
+  Flex,
+  Layout,
+  Menu,
+  Space,
+  theme,
+} from "antd";
+import { Content, Footer, Header } from "antd/es/layout/layout";
+import { useState } from "react";
+import { Navigate, NavLink, Outlet, useLocation } from "react-router-dom";
+import Logo from "../components/icons/Logo";
 import { logout } from "../http/api";
+import { useAuthStore } from "../store";
 const { Sider } = Layout;
 const Dashboard = () => {
+  const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
   const { user, logout: logoutFromStore } = useAuthStore();
 
@@ -44,7 +44,12 @@ const Dashboard = () => {
   } = theme.useToken();
 
   if (user === null) {
-    return <Navigate to="/auth/login" replace={true} />;
+    return (
+      <Navigate
+        to={`/auth/login?returnTo=${location.pathname}`}
+        replace={true}
+      />
+    );
   }
 
   const items = [
@@ -92,7 +97,11 @@ const Dashboard = () => {
           <div className="logo">
             <Logo />
           </div>
-          <Menu defaultSelectedKeys={["/"]} mode="inline" items={items} />
+          <Menu
+            defaultSelectedKeys={[location.pathname]}
+            mode="inline"
+            items={items}
+          />
         </Sider>
         <Layout>
           <Header
