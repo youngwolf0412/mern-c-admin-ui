@@ -29,7 +29,7 @@ import UsersFilter from "./UsersFilter";
 import React, { useEffect } from "react";
 import UserForm from "./forms/UserForm";
 import { PER_PAGE } from "../../constants";
-// import { debounce } from "lodash";
+import { debounce } from "lodash";
 
 const columns = [
   {
@@ -89,7 +89,7 @@ const Users = () => {
 
   useEffect(() => {
     if (currentEditingUser) {
-      console.log("currentEditingUser", currentEditingUser);
+      // console.log("currentEditingUser", currentEditingUser);
       setDrawerOpen(true);
       form.setFieldsValue({
         ...currentEditingUser,
@@ -105,6 +105,7 @@ const Users = () => {
     error,
   } = useQuery({
     queryKey: ["users", queryParams],
+
     queryFn: async () => {
       const filteredParams = Object.fromEntries(
         Object.entries(queryParams).filter((item) => !!item[1])
@@ -113,6 +114,7 @@ const Users = () => {
       const queryString = new URLSearchParams(
         filteredParams as unknown as Record<string, string>
       ).toString();
+      // console.log(queryString); string type me jaayega pura info (perPage=2&currentPage=1&q=brij)
       return getUsers(queryString).then((res) => res.data);
     },
     placeholderData: keepPreviousData,
@@ -153,11 +155,11 @@ const Users = () => {
     setDrawerOpen(false);
   };
 
-  // const debouncedQUpdate = React.useMemo(() => {
-  //   return debounce((value: string | undefined) => {
-  //     setQueryParams((prev) => ({ ...prev, q: value, currentPage: 1 }));
-  //   }, 500);
-  // }, []);
+  const debouncedQUpdate = React.useMemo(() => {
+    return debounce((value: string | undefined) => {
+      setQueryParams((prev) => ({ ...prev, q: value, currentPage: 1 }));
+    }, 500);
+  }, []);
 
   const onFilterChange = (changedFields: FieldData[]) => {
     const changedFilterFields = changedFields
@@ -166,20 +168,15 @@ const Users = () => {
       }))
       .reduce((acc, item) => ({ ...acc, ...item }), {});
 
-    setQueryParams((prev) => ({
-      ...prev,
-      ...changedFilterFields,
-      currentPage: 1,
-    }));
-
-    // if ("q" in changedFilterFields) {
-    //   debouncedQUpdate(changedFilterFields.q);
-    // } else {
-    //   setQueryParams((prev) => ({
-    //     ...prev,
-    //     ...changedFilterFields,
-    //     currentPage: 1,
-    //   }));
+    if ("q" in changedFilterFields) {
+      debouncedQUpdate(changedFilterFields.q);
+    } else {
+      setQueryParams((prev) => ({
+        ...prev,
+        ...changedFilterFields,
+        currentPage: 1,
+      }));
+    }
   };
 
   if (user?.role !== "admin") {
@@ -246,7 +243,7 @@ const Users = () => {
             pageSize: queryParams.perPage,
             current: queryParams.currentPage,
             onChange: (page) => {
-              console.log(page);
+              // console.log(page);
               setQueryParams((prev) => {
                 return {
                   ...prev,
@@ -255,7 +252,7 @@ const Users = () => {
               });
             },
             showTotal: (total: number, range: number[]) => {
-              console.log(total, range);
+              // console.log(total, range);
               return `Showing ${range[0]}-${range[1]} of ${total} items`;
             },
           }}
