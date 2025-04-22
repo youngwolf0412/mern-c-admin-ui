@@ -1,6 +1,6 @@
 import { Card, Col, Form, Input, Row, Select, Space } from "antd";
 import { Tenant } from "../../../types";
-import { getRestaurants } from "../../../http/api";
+import { getTenants } from "../../../http/api";
 import { useQuery } from "@tanstack/react-query";
 
 const UserForm = ({ isEditMode }: { isEditMode: boolean }) => {
@@ -10,7 +10,7 @@ const UserForm = ({ isEditMode }: { isEditMode: boolean }) => {
     queryKey: ["tenants"],
     queryFn: async () => {
       // TODO: make this dynamic, like search for tenants in the input
-      const res = await getRestaurants();
+      const res = await getTenants(`perPage=100&currentPage=1`);
       return res.data;
     },
   });
@@ -69,26 +69,26 @@ const UserForm = ({ isEditMode }: { isEditMode: boolean }) => {
               </Col>
             </Row>
           </Card>
-          {isEditMode && (
-            <Card title="Security info" variant="borderless">
-              <Row gutter={20}>
-                <Col span={12}>
-                  <Form.Item
-                    label="Passoword"
-                    name="password"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Password required",
-                      },
-                    ]}
-                  >
-                    <Input size="large" type="password" />
-                  </Form.Item>
-                </Col>
-              </Row>
-            </Card>
-          )}
+          {/* {isEditMode && ( */}
+          <Card title="Security info" variant="borderless">
+            <Row gutter={20}>
+              <Col span={12}>
+                <Form.Item
+                  label="Passoword"
+                  name="password"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Password required",
+                    },
+                  ]}
+                >
+                  <Input size="large" type="password" />
+                </Form.Item>
+              </Col>
+            </Row>
+          </Card>
+          {/* )} */}
 
           <Card title="Role" variant="borderless">
             <Row gutter={20}>

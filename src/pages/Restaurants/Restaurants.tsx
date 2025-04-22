@@ -2,12 +2,13 @@ import { Breadcrumb, Button, Drawer, Form, Space, Table, theme } from "antd";
 import { Link, Navigate } from "react-router-dom";
 import { RightOutlined } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createTenant, getRestaurants } from "../../http/api";
+import { createTenant, getTenants } from "../../http/api";
 import RestaurantsFilter from "./RestaurantsFilter";
 import { useState } from "react";
 import TenantForm from "./forms/TenantForm";
-import { CreateTenantData } from "../../types";
+import { CreateTenantData, FieldData } from "../../types";
 import { useAuthStore } from "../../store";
+import { PER_PAGE } from "../../constants";
 
 const columns = [
   {
@@ -36,17 +37,24 @@ const Restaurants = () => {
   const [form] = Form.useForm();
   // const [filterForm] = Form.useForm();
 
-  // const [queryParams, setQueryParams] = useState({
-  //     perPage: PER_PAGE,
-  //     currentPage: 1,
-  // });
+  const [queryParams, setQueryParams] = useState({
+    perPage: PER_PAGE,
+    currentPage: 1,
+  });
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const { data: restuarants, isLoading } = useQuery({
     queryKey: ["tenants"],
     queryFn: async () => {
-      const res = await getRestaurants();
-      return res.data;
+      const filteredParams = Object.fromEntries(
+        Object.entries(queryParams).filter((item) => !!item[1])
+      );
+
+      const queryString = new URLSearchParams(
+        filteredParams as unknown as Record<string, string>
+      ).toString();
+
+      return getTenants(queryString).then((res) => res.data);
     },
   });
 
@@ -76,19 +84,19 @@ const Restaurants = () => {
   //     }, 500);
   // }, []);
 
-  // const onFilterChange = (changedFields: FieldData[]) => {
-  //     const changedFilterFields = changedFields
-  //         .map((item) => ({
-  //             [item.name[0]]: item.value,
-  //         }))
-  //         .reduce((acc, item) => ({ ...acc, ...item }), {});
-
-  //     if ('q' in changedFilterFields) {
-  //         debouncedQUpdate(changedFilterFields.q);
-  //     } else {
-  //         setQueryParams((prev) => ({ ...prev, ...changedFilterFields }));
-  //     }
-  // };
+  const onFilterChange = (changedFields: FieldData[]) => {
+    const changedFilterFields = changedFields
+      .map((item) => ({
+        [item.name[0]]: item.value,
+      }))
+      .reduce((acc, item) => ({ ...acc, ...item }), {});
+    setQueryParams((prev) => ({ ...prev, ...changedFilterFields }));
+    //     if ('q' in changedFilterFields) {
+    //         debouncedQUpdate(changedFilterFields.q);
+    //     } else {
+    //         setQueryParams((prev) => ({ ...prev, ...changedFilterFields }));
+    //     }
+  };
 
   if (user?.role !== "admin") {
     return <Navigate to="/" replace={true} />;
@@ -141,7 +149,7 @@ const Restaurants = () => {
           </Space>
         }
       >
-        <Form layout="vertical" form={form}>
+        <Form layout="vertical" form={form} onFieldsChange={onFilterChange}>
           <TenantForm />
         </Form>
       </Drawer>
